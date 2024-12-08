@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { PoemList } from './components/PoemList';
 import { PoemDisplay } from './components/PoemDisplay';
 import { RecitationArea } from './components/RecitationArea';
@@ -53,7 +53,7 @@ function App() {
           <PoemList
             poems={fables}
             onSelectPoem={handlePoemSelect}
-            selectedPoemId={selectedPoem?.id || null}
+            selectedPoemId={selectedPoem?.id.toString() || null}
           />
           
           {selectedPoem ? (

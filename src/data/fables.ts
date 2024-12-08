@@ -420,6 +420,8 @@ export const fables: Poem[] = [
     {
       "id": 341,
       "status": "published",
+      "year": "1668",
+"author": "Jean de La Fontaine",
       "title": "Le Loup et la Cigogne",
       "livre": 3,
       "sort": 51,

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Quote } from 'lucide-react';
 import { PoemDisplayProps } from '../types/poetry';
-import { Card } from './ui/Card';
+import Card  from './ui/Card';
 
 export function PoemDisplay({ poem, validatedLines = [] }: PoemDisplayProps) {
   const [currentSection, setCurrentSection] = useState(0);

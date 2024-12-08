@@ -3,8 +3,8 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 import { RecitationProps } from '../types/poetry';
 import { validateLine } from '../utils/validation';
 import { addRecitedVerse } from '../utils/localStorage';
-import { Textarea } from './ui/Textarea';
-import { Card } from './ui/Card';
+import CustomTextarea from './ui/Textarea';
+import Card  from './ui/Card';
 
 export function RecitationArea({ poem, onValidation }: RecitationProps) {
   const [recitation, setRecitation] = useState('');
@@ -58,18 +58,18 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
       
       if (isCorrect) {
         // Store the recited verse
-        addRecitedVerse(poem.id, poem.title, poem.content[currentLineIndex]);
+        addRecitedVerse(poem.id.toString(), poem.title, poem.content[currentLineIndex]);
 
         // Update validated lines
         const newValidatedLines = [...validatedLines];
         newValidatedLines[currentLineIndex] = true;
         setValidatedLines(newValidatedLines);
         onValidation(newValidatedLines);
-        
+
         // Update correct count
         const newCorrectCount = newValidatedLines.filter(Boolean).length;
         setCorrectCount(newCorrectCount);
-        
+
         // Move to next line
         const nextLineIndex = currentLineIndex + 1;
         setCurrentLineIndex(nextLineIndex);
@@ -116,7 +116,7 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
         </div>
       </div>
 
-      <Textarea
+      <CustomTextarea
         ref={textareaRef}
         value={recitation}
         onChange={handleRecitationChange}

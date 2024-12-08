@@ -1,9 +1,18 @@
 export interface Poem {
-  id: string;
+  id: number;
   title: string;
   author: string;
   content: string[];
-  year?: number;
+  year?: string;
+  status: string;
+  livre: number;
+  cover: string | null;
+  sort: number;
+  prev: number | null;
+  next: number | null;
+  Slug: string;
+  learnt: boolean;
+  number: number;
 }
 
 export interface PoemDisplayProps {

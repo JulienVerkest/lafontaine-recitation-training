@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BookOpen, ChevronUp, ChevronDown, Search, Filter } from 'lucide-react';
 import { PoemListProps } from '../types/poetry';
-import { Card } from './ui/Card';
+import Card from './ui/Card';
 
 export function PoemList({ poems, onSelectPoem, selectedPoemId }: PoemListProps) {
   const [startIndex, setStartIndex] = useState(0);
@@ -89,7 +89,7 @@ export function PoemList({ poems, onSelectPoem, selectedPoemId }: PoemListProps)
               key={poem.id}
               onClick={() => onSelectPoem(poem)}
               className={`w-full text-left p-4 rounded-lg transition-all ${
-                selectedPoemId === poem.id
+                selectedPoemId === String(poem.id)
                   ? 'bg-indigo-50 border-2 border-indigo-500'
                   : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent'
               }`}
