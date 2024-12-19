@@ -43,7 +43,7 @@ export function PoemList({ poems, onSelectPoem, selectedPoemId }: PoemListProps)
   };
 
   return (
-    <Card className="w-full max-w-md relative" onKeyDown={handleKeyDown} tabIndex={0}>
+    <Card className="w-full" onKeyDown={handleKeyDown} tabIndex={0}>
       <div className="mb-6">
         <div className="space-y-2">
           <div className="relative">
@@ -99,9 +99,6 @@ export function PoemList({ poems, onSelectPoem, selectedPoemId }: PoemListProps)
                 <div className="flex-grow">
                   <h3 className="font-serif text-lg text-gray-800">{poem.title}</h3>
                   <div className="flex justify-between items-center">
-                    {/* <p className="text-sm text-gray-600">
-                      {poem.author} {poem.year ? `(${poem.year})` : ''}
-                    </p> */}
                     <span className="text-xs text-gray-500">
                       {poem.content.length} vers
                     </span>

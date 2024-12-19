@@ -6,7 +6,7 @@ interface StatsProps {
 
 export function Stats({ versesCount }: StatsProps) {
   return (
-    <div className="fixed top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4 flex items-center gap-3 z-50 transition-all hover:scale-105">
+    <div className="bg-gray-50 rounded-lg p-4 flex items-center gap-3">
       <BookOpen className="w-6 h-6 text-indigo-600" />
       <div>
         <div className="text-sm text-gray-600 font-medium">Vers récités</div>

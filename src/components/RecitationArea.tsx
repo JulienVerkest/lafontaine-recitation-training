@@ -11,6 +11,7 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
   const [validatedLines, setValidatedLines] = useState<boolean[]>([]);
   const [correctCount, setCorrectCount] = useState(0);
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
+  const [isHighlighted, setIsHighlighted] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const VERSES_PER_SECTION = 7;
 
@@ -19,6 +20,12 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
     setValidatedLines([]);
     setCorrectCount(0);
     setCurrentLineIndex(0);
+    
+    // Add highlight effect when poem changes
+    if (poem) {
+      setIsHighlighted(true);
+      setTimeout(() => setIsHighlighted(false), 1000);
+    }
   }, [poem]);
 
   useEffect(() => {
@@ -29,7 +36,6 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
         const newIndex = customEvent.detail.startIndex;
         setCurrentLineIndex(newIndex);
         
-        // Ensure validatedLines array is properly sized
         const newValidatedLines = [...validatedLines];
         while (newValidatedLines.length < newIndex) {
           newValidatedLines.push(true);
@@ -57,26 +63,20 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
       const isCorrect = validateLine(currentLine, poem.content[currentLineIndex]);
       
       if (isCorrect) {
-        // Store the recited verse
         addRecitedVerse(poem.id.toString(), poem.title, poem.content[currentLineIndex]);
 
-        // Update validated lines
         const newValidatedLines = [...validatedLines];
         newValidatedLines[currentLineIndex] = true;
         setValidatedLines(newValidatedLines);
         onValidation(newValidatedLines);
 
-        // Update correct count
         const newCorrectCount = newValidatedLines.filter(Boolean).length;
         setCorrectCount(newCorrectCount);
 
-        // Move to next line
         const nextLineIndex = currentLineIndex + 1;
         setCurrentLineIndex(nextLineIndex);
         
-        // Add new line to textarea if not at the end
         if (nextLineIndex < poem.content.length) {
-          // Remove any extra newlines and add just one
           const cleanedLines = lines.slice(0, -1).concat([currentLine]);
           const newValue = cleanedLines.join('\n') + '\n';
           
@@ -100,9 +100,13 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
   const progress = (correctCount / poem.content.length) * 100;
 
   return (
-    <Card className="w-full max-w-4xl mt-8">
+    <Card className={`w-full transition-all duration-500 ${
+      isHighlighted 
+        ? 'shadow-[0_0_15px_rgba(99,102,241,0.5)] border-2 border-indigo-500' 
+        : 'shadow-md border border-gray-200'
+    }`}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-serif text-gray-800">Récitation</h2>
+        <h2 className="text-2xl font-serif text-gray-800">Récitons <em>{poem.title}</em></h2>
         <div className="flex items-center gap-4">
           <div className="h-2 w-32 bg-gray-200 rounded-full overflow-hidden">
             <div 

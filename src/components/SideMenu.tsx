@@ -1,8 +1,13 @@
 import  { useState } from 'react';
 import { Menu, X, BookOpen, ChevronRight } from 'lucide-react';
 import { getRecitedVerses } from '../utils/localStorage';
+import { Stats } from './Stats';
 
-export function SideMenu() {
+interface SideMenuProps {
+  versesCount: number;
+}
+
+export function SideMenu({ versesCount }: SideMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const recitedVerses = getRecitedVerses();
 
@@ -40,7 +45,9 @@ export function SideMenu() {
             </button>
           </div>
 
-          <div className="space-y-2 max-h-[calc(100vh-8rem)] overflow-y-auto">
+          <Stats versesCount={versesCount} />
+
+          <div className="mt-6 space-y-2 max-h-[calc(100vh-12rem)] overflow-y-auto">
             {Object.entries(recitedVerses).length === 0 ? (
               <p className="text-gray-500 text-center italic">
                 Aucun vers récité pour le moment
