@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BookOpen, Search, Filter } from 'lucide-react';
 import { PoemListProps } from '../types/poetry';
 
