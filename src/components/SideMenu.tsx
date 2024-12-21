@@ -1,5 +1,5 @@
-import  { useState } from 'react';
-import { Menu, X, BookOpen, ChevronRight, ChevronDown } from 'lucide-react';
+import  { useState, useEffect } from 'react';
+import { Menu, X, BookOpen, ChevronRight, ChevronDown, Pin } from 'lucide-react';
 import { getRecitedVerses } from '../utils/localStorage';
 import { Stats } from './Stats';
 import { PoemList } from './PoemList';
@@ -43,20 +43,36 @@ function CollapsibleSection({ title, children, defaultOpen = false }: Collapsibl
 
 export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: SideMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
   const recitedVerses = getRecitedVerses();
+
+  // Gérer le redimensionnement de la fenêtre
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024) { // lg breakpoint
+        setIsPinned(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <>
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed left-4 top-4 z-40 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-3 hover:bg-gray-50 transition-colors"
-        aria-label="Ouvrir le menu"
-      >
-        <Menu className="w-6 h-6 text-indigo-600" />
-      </button>
+      {/* Bouton du menu (visible seulement si non épinglé) */}
+      {!isPinned && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="fixed left-4 top-4 z-40 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-3 hover:bg-gray-50 transition-colors"
+          aria-label="Ouvrir le menu"
+        >
+          <Menu className="w-6 h-6 text-indigo-600" />
+        </button>
+      )}
 
-      {/* Overlay */}
-      {isOpen && (
+      {/* Overlay (visible seulement si le menu est ouvert et non épinglé) */}
+      {isOpen && !isPinned && (
         <div
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
           onClick={() => setIsOpen(false)}
@@ -65,19 +81,32 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
 
       {/* Side Menu */}
       <div className={`fixed top-0 left-0 h-full w-96 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
+        isPinned ? 'translate-x-0' : isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="h-full flex flex-col">
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-serif text-gray-800">Menu</h2>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                aria-label="Fermer le menu"
-              >
-                <X className="w-5 h-5 text-gray-600" />
-              </button>
+              <div className="flex items-center gap-2">
+                {/* Bouton pour épingler (visible seulement sur grands écrans) */}
+                <button
+                  onClick={() => setIsPinned(!isPinned)}
+                  className="hidden lg:flex p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  aria-label={isPinned ? "Détacher le menu" : "Épingler le menu"}
+                >
+                  <Pin className={`w-5 h-5 text-gray-600 transition-transform ${isPinned ? 'rotate-45' : ''}`} />
+                </button>
+                {/* Bouton fermer (visible seulement si non épinglé) */}
+                {!isPinned && (
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    aria-label="Fermer le menu"
+                  >
+                    <X className="w-5 h-5 text-gray-600" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -87,13 +116,13 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
                 poems={poems}
                 onSelectPoem={(poem) => {
                   onSelectPoem(poem);
-                  setIsOpen(false);
+                  if (!isPinned) setIsOpen(false);
                 }}
                 selectedPoemId={selectedPoemId}
               />
             </CollapsibleSection>
 
-            <CollapsibleSection title="Vers récités" defaultOpen={true}>
+            <CollapsibleSection title="Vers récités">
               <div className="space-y-4">
                 <Stats versesCount={versesCount} />
                 
@@ -142,6 +171,9 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
           </div>
         </div>
       </div>
+
+      {/* Ajustement du contenu principal quand le menu est épinglé */}
+      {isPinned && <div className="w-96" />}
     </>
   );
 }

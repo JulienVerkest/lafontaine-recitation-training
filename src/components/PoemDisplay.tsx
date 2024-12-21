@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Quote } from 'lucide-react';
 import { PoemDisplayProps } from '../types/poetry';
-import Card  from './ui/Card';
+import { compareCharacters } from '../utils/validation';
+import Card from './ui/Card';
 
-export function PoemDisplay({ poem, validatedLines = [] }: PoemDisplayProps) {
+export function PoemDisplay({ 
+  poem, 
+  validatedLines = [], 
+  currentTypedText = '',
+  currentLineIndex = 0 
+}: PoemDisplayProps) {
   const [currentSection, setCurrentSection] = useState(0);
   const VERSES_PER_SECTION = 4;
 
@@ -12,7 +18,6 @@ export function PoemDisplay({ poem, validatedLines = [] }: PoemDisplayProps) {
     const newSection = Math.floor(correctLines / VERSES_PER_SECTION);
     if (newSection !== currentSection && newSection * VERSES_PER_SECTION === correctLines) {
       setCurrentSection(newSection);
-      // Dispatch a custom event when the section changes
       window.dispatchEvent(new CustomEvent('sectionChange', { 
         detail: { section: newSection } 
       }));
@@ -23,6 +28,32 @@ export function PoemDisplay({ poem, validatedLines = [] }: PoemDisplayProps) {
     const start = currentSection * VERSES_PER_SECTION;
     const end = start + VERSES_PER_SECTION;
     return poem.content.slice(start, end);
+  };
+
+  const highlightText = (text: string, index: number) => {
+    if (index !== currentLineIndex) return text;
+
+    const charResults = compareCharacters(currentTypedText, text);
+    
+    return text.split('').map((char, i) => {
+      const isCorrect = charResults[i];
+      const isPending = i >= charResults.length;
+
+      return (
+        <span
+          key={i}
+          className={`transition-colors ${
+            isCorrect 
+              ? 'text-green-600 font-medium'
+              : isPending 
+                ? 'text-gray-400'
+                : 'text-red-600'
+          }`}
+        >
+          {char}
+        </span>
+      );
+    });
   };
 
   return (
@@ -45,10 +76,10 @@ export function PoemDisplay({ poem, validatedLines = [] }: PoemDisplayProps) {
               className={`text-xl font-serif leading-relaxed transition-all duration-500 ease-in-out transform ${
                 validatedLines[absoluteIndex]
                   ? 'text-gray-800 bg-green-50 scale-[1.02] pl-4 border-l-4 border-green-500'
-                  : 'text-gray-400'
+                  : ''
               }`}
             >
-              {line}
+              {highlightText(line, absoluteIndex)}
             </p>
           );
         })}

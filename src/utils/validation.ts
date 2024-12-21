@@ -21,3 +21,44 @@ export function validateRecitation(recited: string[], original: string[]): boole
     return validateLine(line, original[index]);
   });
 }
+
+// Nouvelle fonction pour la comparaison caractère par caractère
+export function compareCharacters(typed: string, original: string): boolean[] {
+  const normalizedTyped = typed.toLowerCase();
+  const normalizedOriginal = original.toLowerCase();
+  
+  const results: boolean[] = [];
+  let typedIndex = 0;
+  
+  for (let i = 0; i < normalizedOriginal.length; i++) {
+    const originalChar = normalizedOriginal[i];
+    
+    // Si c'est un caractère de ponctuation, on le marque comme correct
+    if (/[.,!?;:«»""''()\-—\s]/.test(originalChar)) {
+      results.push(true);
+      continue;
+    }
+    
+    // Si on a dépassé la longueur du texte tapé
+    if (typedIndex >= normalizedTyped.length) {
+      results.push(false);
+      continue;
+    }
+    
+    // On cherche le prochain caractère non-ponctuation dans le texte tapé
+    while (typedIndex < normalizedTyped.length && 
+           /[.,!?;:«»""''()\-—\s]/.test(normalizedTyped[typedIndex])) {
+      typedIndex++;
+    }
+    
+    // Comparaison des caractères
+    results.push(
+      typedIndex < normalizedTyped.length && 
+      normalizedTyped[typedIndex] === originalChar
+    );
+    
+    typedIndex++;
+  }
+  
+  return results;
+}

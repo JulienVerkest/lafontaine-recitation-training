@@ -18,6 +18,8 @@ export interface Poem {
 export interface PoemDisplayProps {
   poem: Poem;
   validatedLines?: boolean[];
+  currentTypedText?: string; // Ajout de la nouvelle prop
+  currentLineIndex?: number; // Ajout de la nouvelle prop
 }
 
 export interface PoemListProps {
@@ -29,6 +31,7 @@ export interface PoemListProps {
 export interface RecitationProps {
   poem: Poem | null;
   onValidation: (validatedLines: boolean[]) => void;
+  onTextChange?: (text: string, lineIndex: number) => void; // Ajout de la nouvelle prop
 }
 
 export interface ValidationResult {
