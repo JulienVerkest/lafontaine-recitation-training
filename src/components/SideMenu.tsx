@@ -1,5 +1,5 @@
 import  { useState, useEffect } from 'react';
-import { Menu, X, BookOpen, ChevronRight, ChevronDown, Pin } from 'lucide-react';
+import { Menu, X, BookOpen, ChevronRight, ChevronDown, Pin, Star } from 'lucide-react';
 import { getRecitedVerses } from '../utils/localStorage';
 import { Stats } from './Stats';
 import { PoemList } from './PoemList';
@@ -49,6 +49,13 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
   const [currentDifficulty, setCurrentDifficulty] = useState<Difficulty>('easy');
   const recitedVerses = getRecitedVerses();
 
+  // Fonction pour vérifier si une fable est entièrement récitée
+  const isPoemCompleted = (poemId: string) => {
+    const poem = poems.find(p => p.id.toString() === poemId);
+    const verses = recitedVerses[poemId];
+    return poem && verses && verses.lines.length === poem.content.length;
+  };
+
   useEffect(() => {
     const handleResize = () => {
       const isLargeScreen = window.innerWidth >= 1024;
@@ -59,7 +66,6 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
     handleResize();
     window.addEventListener('resize', handleResize);
 
-    // Écouter les changements de focus de la récitation
     const handleFocusChange = (event: CustomEvent) => {
       setIsFocused(event.detail.isFocused);
       setCurrentDifficulty(event.detail.difficulty);
@@ -81,7 +87,6 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
 
   return (
     <>
-      {/* Bouton du menu (visible seulement si non épinglé) */}
       {!isPinned && (
         <button
           onClick={() => setIsOpen(true)}
@@ -94,7 +99,6 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
         </button>
       )}
 
-      {/* Overlay (visible seulement si le menu est ouvert et non épinglé) */}
       {isOpen && !isPinned && (
         <div
           className={`fixed inset-0 bg-black/20 ${isFocused ? blurAmount : ''} z-40`}
@@ -102,7 +106,6 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
         />
       )}
 
-      {/* Side Menu */}
       <div className={`fixed top-0 left-0 h-full w-96 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
         isPinned ? 'translate-x-0' : isOpen ? 'translate-x-0' : '-translate-x-full'
       } ${isFocused ? 'opacity-50' : ''}`}>
@@ -111,7 +114,6 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-serif text-gray-800">Menu</h2>
               <div className="flex items-center gap-2">
-                {/* Bouton pour épingler (visible seulement sur grands écrans) */}
                 <button
                   onClick={() => setIsPinned(!isPinned)}
                   className="hidden lg:flex p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -119,7 +121,6 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
                 >
                   <Pin className={`w-5 h-5 text-gray-600 transition-transform ${isPinned ? 'rotate-45' : ''}`} />
                 </button>
-                {/* Bouton fermer (visible seulement si non épinglé) */}
                 {!isPinned && (
                   <button
                     onClick={() => setIsOpen(false)}
@@ -155,38 +156,48 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
                       Aucun vers récité pour le moment
                     </p>
                   ) : (
-                    Object.entries(recitedVerses).map(([poemId, verses]) => (
-                      <details
-                        key={poemId}
-                        className="group bg-gray-50 rounded-lg overflow-hidden"
-                      >
-                        <summary className="flex items-center gap-3 p-3 cursor-pointer hover:bg-gray-100 transition-colors">
-                          <BookOpen className="w-4 h-4 text-indigo-600 flex-shrink-0" />
-                          <span className="font-medium text-gray-800 flex-grow">
-                            {verses.poemTitle}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {verses.lines.length} vers
-                          </span>
-                          <ChevronRight className="w-4 h-4 text-gray-400 transition-transform group-open:rotate-90" />
-                        </summary>
-                        <div className="px-4 py-2 space-y-1 border-t border-gray-200">
-                          {verses.lines.map((line, index) => (
-                            <div 
-                              key={index}
-                              className="flex items-start gap-2 py-1 text-sm"
-                            >
-                              <span className="text-indigo-500 font-medium min-w-[1.5rem] text-right">
-                                {index + 1}.
-                              </span>
-                              <p className="text-gray-600 leading-relaxed">
-                                {line}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      </details>
-                    ))
+                    Object.entries(recitedVerses).map(([poemId, verses]) => {
+                      const isCompleted = isPoemCompleted(poemId);
+                      return (
+                        <details
+                          key={poemId}
+                          className={`group rounded-lg overflow-hidden ${
+                            isCompleted ? 'bg-green-50 ring-1 ring-green-200' : 'bg-gray-50'
+                          }`}
+                        >
+                          <summary className="flex items-center gap-3 p-3 cursor-pointer hover:bg-green-100/50 transition-colors">
+                            <BookOpen className={`w-4 h-4 ${isCompleted ? 'text-green-600' : 'text-indigo-600'} flex-shrink-0`} />
+                            <span className={`font-medium flex-grow ${isCompleted ? 'text-green-800' : 'text-gray-800'}`}>
+                              {verses.poemTitle}
+                              {isCompleted && (
+                                <Star className="w-4 h-4 text-yellow-400 inline-block ml-2 fill-yellow-400" />
+                              )}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {verses.lines.length} vers
+                            </span>
+                            <ChevronRight className="w-4 h-4 text-gray-400 transition-transform group-open:rotate-90" />
+                          </summary>
+                          <div className="px-4 py-2 space-y-1 border-t border-gray-200">
+                            {verses.lines.map((line, index) => (
+                              <div 
+                                key={index}
+                                className="flex items-start gap-2 py-1 text-sm"
+                              >
+                                <span className={`font-medium min-w-[1.5rem] text-right ${
+                                  isCompleted ? 'text-green-500' : 'text-indigo-500'
+                                }`}>
+                                  {index + 1}.
+                                </span>
+                                <p className="text-gray-600 leading-relaxed">
+                                  {line}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </details>
+                      );
+                    })
                   )}
                 </div>
               </div>
@@ -195,7 +206,6 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
         </div>
       </div>
 
-      {/* Ajustement du contenu principal quand le menu est épinglé */}
       {isPinned && <div className="w-96" />}
     </>
   );

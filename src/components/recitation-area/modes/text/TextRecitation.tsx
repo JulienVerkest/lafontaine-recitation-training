@@ -7,6 +7,9 @@ import { VerseProgressList } from '../../VerseProgressList';
 import { Mic } from 'lucide-react';
 import CustomTextarea from '../../../../components/ui/Textarea';
 import { DifficultySelector, type Difficulty } from '../../DifficultySelector';
+import { Toolbar } from '../../toolbar/Toolbar';
+import { ToolbarButton } from '../../toolbar/ToolbarButton';
+import { ToolbarSeparator } from '../../toolbar/ToolbarSeparator';
 
 export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch }: BaseRecitationProps) {
   const [isFocused, setIsFocused] = useState(false);
@@ -40,7 +43,6 @@ export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch 
     updateRecitation(currentLine);
     
     if (validateVerse(currentLine) && state.currentLineIndex < poem.content.length) {
-      // Ajouter automatiquement un retour à la ligne après la validation
       const newValue = value + '\n';
       setTextareaContent(newValue);
       
@@ -69,17 +71,18 @@ export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch 
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
             <h2 className="text-base md:text-2xl font-serif text-gray-800">Récitation écrite</h2>
-            <button
-              onClick={onModeSwitch}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              title="Passer en mode vocal"
-            >
-              <Mic className="w-5 h-5 text-gray-600" />
-            </button>
-            <DifficultySelector 
-              difficulty={difficulty}
-              onChange={setDifficulty}
-            />
+            <Toolbar>
+              <ToolbarButton
+                onClick={onModeSwitch}
+                title="Passer en mode vocal"
+                icon={<Mic className="w-4 h-4" />}
+              />
+              <ToolbarSeparator />
+              <DifficultySelector 
+                difficulty={difficulty}
+                onChange={setDifficulty}
+              />
+            </Toolbar>
           </div>
           <ProgressBar 
             progress={progress}

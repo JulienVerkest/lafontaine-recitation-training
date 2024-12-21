@@ -13,7 +13,7 @@ export function DifficultySelector({ difficulty, onChange }: DifficultySelectorP
       <select
         value={difficulty}
         onChange={(e) => onChange(e.target.value as Difficulty)}
-        className="appearance-none bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 pl-3 pr-8 rounded-lg transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="h-8 appearance-none bg-transparent hover:bg-gray-100 text-sm text-gray-700 py-1 pl-3 pr-8 rounded transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500"
       >
         <option value="easy">Facile</option>
         <option value="medium">Moyen</option>

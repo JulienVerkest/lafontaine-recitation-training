@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { BaseRecitationProps } from '../../common/types';
 import { useRecitation } from '../../common/useRecitation';
 import { useVoiceRecognition } from '../../useVoiceRecognition';
@@ -7,6 +7,9 @@ import { ProgressBar } from '../../ProgressBar';
 import { VerseProgressList } from '../../VerseProgressList';
 import { Keyboard, Mic, MicOff } from 'lucide-react';
 import { DifficultySelector, type Difficulty } from '../../DifficultySelector';
+import { Toolbar } from '../../toolbar/Toolbar';
+import { ToolbarButton } from '../../toolbar/ToolbarButton';
+import { ToolbarSeparator } from '../../toolbar/ToolbarSeparator';
 
 interface VoiceRecognitionButtonProps {
   isListening: boolean;
@@ -54,18 +57,12 @@ export function VoiceRecitation({ poem, onValidation, onTextChange, onModeSwitch
 
   const { isListening, toggleMicrophone } = useVoiceRecognition(handleTranscriptUpdate);
 
-  const blurAmount = {
-    easy: 'backdrop-blur-[2px]',
-    medium: 'backdrop-blur-[3px]',
-    hard: 'backdrop-blur-[4px]'
-  }[difficulty];
-
   const progress = (state.correctCount / poem.content.length) * 100;
 
   return (
     <>
       {isFocused && (
-        <div className={`fixed inset-0 bg-black/20 ${blurAmount} transition-all duration-300 ease-in-out z-10`} />
+        <div className={`fixed inset-0 bg-black/20 ${blurAmount[difficulty]} transition-all duration-300 ease-in-out z-10`} />
       )}
       <Card className={`w-full transition-all duration-500 relative z-20 shadow-md border border-gray-200 ${
         isFocused ? 'ring-4 ring-indigo-100' : ''
@@ -73,17 +70,18 @@ export function VoiceRecitation({ poem, onValidation, onTextChange, onModeSwitch
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
             <h2 className="text-base md:text-2xl font-serif text-gray-800">Récitation Vocale</h2>
-            <button
-              onClick={onModeSwitch}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              title="Passer en mode texte"
-            >
-              <Keyboard className="w-5 h-5 text-gray-600" />
-            </button>
-            <DifficultySelector 
-              difficulty={difficulty}
-              onChange={setDifficulty}
-            />
+            <Toolbar>
+              <ToolbarButton
+                onClick={onModeSwitch}
+                title="Passer en mode texte"
+                icon={<Keyboard className="w-4 h-4" />}
+              />
+              <ToolbarSeparator />
+              <DifficultySelector 
+                difficulty={difficulty}
+                onChange={setDifficulty}
+              />
+            </Toolbar>
           </div>
           <ProgressBar 
             progress={progress}
@@ -126,3 +124,9 @@ export function VoiceRecitation({ poem, onValidation, onTextChange, onModeSwitch
     </>
   );
 }
+
+const blurAmount = {
+  easy: 'backdrop-blur-[2px]',
+  medium: 'backdrop-blur-[3px]',
+  hard: 'backdrop-blur-[4px]'
+} as const;
