@@ -63,7 +63,7 @@ function App() {
             ))}
           </h1>
           <p className="elegant-subtitle text-xl">
-            Apprenez et récitez les plus belles fables
+            Récitez les plus belles fables
           </p>
         </header>
 

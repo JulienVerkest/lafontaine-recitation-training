@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BaseRecitationProps } from '../../common/types';
 import { useRecitation } from '../../common/useRecitation';
 import { useVoiceRecognition } from '../../useVoiceRecognition';

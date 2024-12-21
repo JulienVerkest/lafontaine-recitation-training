@@ -17,14 +17,14 @@ export function RecitationArea({ poem, onValidation, onTextChange }: RecitationP
     <TextRecitation
       poem={poem}
       onValidation={onValidation}
-      onTextChange={onTextChange}
+      onTextChange={onTextChange || (() => {})}
       onModeSwitch={toggleMode}
     />
   ) : (
     <VoiceRecitation
       poem={poem}
       onValidation={onValidation}
-      onTextChange={onTextChange}
+      onTextChange={onTextChange || (() => {})}
       onModeSwitch={toggleMode}
     />
   );

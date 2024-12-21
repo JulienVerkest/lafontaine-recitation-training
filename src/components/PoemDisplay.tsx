@@ -63,7 +63,7 @@ export function PoemDisplay({
         <div>
           <h1 className="text-3xl font-serif text-gray-800">{poem.title}</h1>
           <p className="text-lg text-gray-600">
-            {poem.author} {poem.year ? `(${poem.year})` : ''}
+            Livre {poem.livre}, fable {poem.number}, {poem.year ? `(${poem.year})` : ''}
           </p>
         </div>
       </div>
