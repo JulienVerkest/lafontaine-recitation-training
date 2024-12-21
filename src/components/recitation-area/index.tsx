@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { CheckCircle2, XCircle, Mic, MicOff } from 'lucide-react';
-import { RecitationProps } from '../types/poetry';
-import { validateLine } from '../utils/validation';
-import { addRecitedVerse } from '../utils/localStorage';
-import CustomTextarea from './ui/Textarea';
-import Card  from './ui/Card';
+import { RecitationProps } from '../../types/poetry';
+import { validateLine } from '../../utils/validation';
+import { addRecitedVerse } from '../../utils/localStorage';
+import CustomTextarea from '../ui/Textarea';
+import Card from '../ui/Card';
+import { ProgressBar } from './ProgressBar';
+import { VoiceRecognitionButton } from './VoiceRecognitionButton';
+import { VerseProgressList } from './VerseProgressList';
+import { useVoiceRecognition } from './useVoiceRecognition';
 
 export function RecitationArea({ poem, onValidation, onTextChange }: RecitationProps) {
   const [recitation, setRecitation] = useState('');
@@ -12,48 +15,19 @@ export function RecitationArea({ poem, onValidation, onTextChange }: RecitationP
   const [correctCount, setCorrectCount] = useState(0);
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   const [isHighlighted, setIsHighlighted] = useState(false);
-  const [isListening, setIsListening] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const VERSES_PER_SECTION = 4;
 
-  useEffect(() => {
-    if (window.SpeechRecognition || window.webkitSpeechRecognition) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = true;
-      recognitionRef.current.interimResults = true;
-      recognitionRef.current.lang = 'fr-FR';
+  const handleTranscriptUpdate = (transcript: string) => {
+    setRecitation(prev => {
+      const lines = prev.split('\n');
+      lines[lines.length - 1] = transcript;
+      return lines.join('\n');
+    });
+  };
 
-      recognitionRef.current.onresult = (event) => {
-        const transcript = Array.from(event.results)
-          .map(result => result[0].transcript)
-          .join('');
-
-        setRecitation(prev => {
-          const lines = prev.split('\n');
-          lines[lines.length - 1] = transcript;
-          return lines.join('\n');
-        });
-      };
-
-      recognitionRef.current.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        setIsListening(false);
-      };
-
-      recognitionRef.current.onend = () => {
-        setIsListening(false);
-      };
-    }
-
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
-    };
-  }, []);
+  const { isListening, toggleMicrophone } = useVoiceRecognition(handleTranscriptUpdate);
 
   useEffect(() => {
     setRecitation('');
@@ -83,21 +57,6 @@ export function RecitationArea({ poem, onValidation, onTextChange }: RecitationP
       window.removeEventListener('sectionChange', handleSectionChange);
     };
   }, []);
-
-  const toggleMicrophone = () => {
-    if (!recognitionRef.current) {
-      alert("La reconnaissance vocale n'est pas supportée par votre navigateur.");
-      return;
-    }
-
-    if (isListening) {
-      recognitionRef.current.stop();
-    } else {
-      setRecitation(prev => prev + '\n');
-      recognitionRef.current.start();
-    }
-    setIsListening(!isListening);
-  };
 
   const handleRecitationChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -173,17 +132,11 @@ export function RecitationArea({ poem, onValidation, onTextChange }: RecitationP
       } ${isFocused ? 'ring-4 ring-indigo-100' : ''}`}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-serif text-gray-800">Récitation</h2>
-          <div className="flex items-center gap-4">
-            <div className="h-2 w-32 bg-gray-200 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-green-500 transition-all duration-500"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <span className="text-lg font-serif text-gray-600">
-              {correctCount}/{poem.content.length}
-            </span>
-          </div>
+          <ProgressBar 
+            progress={progress}
+            totalVerses={poem.content.length}
+            completedVerses={correctCount}
+          />
         </div>
 
         <div className="flex gap-6">
@@ -199,53 +152,19 @@ export function RecitationArea({ poem, onValidation, onTextChange }: RecitationP
                 className="h-48 font-serif text-lg resize-none w-full pr-12"
                 spellCheck={false}
               />
-              <button
+              <VoiceRecognitionButton 
+                isListening={isListening}
                 onClick={toggleMicrophone}
-                className={`absolute right-2 bottom-2 p-2 rounded-full transition-colors ${
-                  isListening 
-                    ? 'bg-red-100 hover:bg-red-200 text-red-600' 
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
-                }`}
-                title={isListening ? "Arrêter la dictée" : "Commencer la dictée"}
-              >
-                {isListening ? (
-                  <MicOff className="w-5 h-5" />
-                ) : (
-                  <Mic className="w-5 h-5" />
-                )}
-              </button>
+              />
             </div>
           </div>
 
-          <div id="progressRecitation" className="w-64 bg-gray-50 rounded-lg p-4">
-            <div className="text-sm font-medium text-gray-600 mb-3 hidden">
-              Progression de la section {currentSection + 1}
-            </div>
-            <div className="space-y-2">
-              {getCurrentSectionLines().map((isCorrect, index) => (
-                <div 
-                  key={index} 
-                  className={`flex items-center gap-2 p-2 rounded-lg transition-colors ${
-                    isCorrect ? 'bg-green-50' : 'bg-white'
-                  }`}
-                  style={{ 
-                    opacity: isCorrect ? 1 : getOpacity(index)
-                  }}
-                >
-                  {isCorrect ? (
-                    <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  ) : (
-                    <XCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-                  )}
-                  <span className={`font-serif text-xs ${
-                    isCorrect ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    Vers {currentSection * VERSES_PER_SECTION + index + 1}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <VerseProgressList
+            validatedLines={getCurrentSectionLines()}
+            currentSection={currentSection}
+            versesPerSection={VERSES_PER_SECTION}
+            getOpacity={getOpacity}
+          />
         </div>
       </Card>
     </>

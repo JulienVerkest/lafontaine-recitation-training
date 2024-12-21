@@ -1,6 +1,6 @@
 import  { useState, useEffect } from 'react';
 import { PoemDisplay } from './components/PoemDisplay';
-import { RecitationArea } from './components/RecitationArea';
+import { RecitationArea } from './components/recitation-area';
 import { SideMenu } from './components/SideMenu';
 import { fables } from './data/fables';
 import { Poem } from './types/poetry';
