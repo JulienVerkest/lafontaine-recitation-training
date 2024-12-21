@@ -1,5 +1,4 @@
 import  { useState, useEffect } from 'react';
-import { PoemList } from './components/PoemList';
 import { PoemDisplay } from './components/PoemDisplay';
 import { RecitationArea } from './components/RecitationArea';
 import { SideMenu } from './components/SideMenu';
@@ -35,14 +34,26 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
-      <SideMenu versesCount={totalVersesCount} />
+    <div className="min-h-screen">
+      <div className="background-container" />
+      <div className="background-overlay" />
+      
+      <SideMenu 
+        poems={fables}
+        onSelectPoem={handlePoemSelect}
+        selectedPoemId={selectedPoem?.id.toString() || null}
+        versesCount={totalVersesCount}
+      />
       <div className="container mx-auto px-4 py-12">
         <header className="text-center mb-8">
-          <h1 className="text-4xl font-serif text-gray-800 mb-2">
-            Les Fables de La Fontaine
+          <h1 className="elegant-title text-5xl mb-4 tracking-wide">
+            {"Les Fables de La Fontaine".split('').map((char, i) => (
+              <span key={i} className="inline-block mx-[0.01em]">
+                {char}
+              </span>
+            ))}
           </h1>
-          <p className="text-gray-600 mb-8">
+          <p className="elegant-subtitle text-xl">
             Apprenez et récitez les plus belles fables
           </p>
         </header>
@@ -51,12 +62,6 @@ function App() {
           <RecitationArea 
             poem={selectedPoem} 
             onValidation={handleValidation}
-          />
-
-          <PoemList
-            poems={fables}
-            onSelectPoem={handlePoemSelect}
-            selectedPoemId={selectedPoem?.id.toString() || null}
           />
 
           {selectedPoem ? (

@@ -5,7 +5,7 @@ import Card  from './ui/Card';
 
 export function PoemDisplay({ poem, validatedLines = [] }: PoemDisplayProps) {
   const [currentSection, setCurrentSection] = useState(0);
-  const VERSES_PER_SECTION = 7;
+  const VERSES_PER_SECTION = 4;
 
   useEffect(() => {
     const correctLines = validatedLines.filter(Boolean).length;
@@ -26,7 +26,7 @@ export function PoemDisplay({ poem, validatedLines = [] }: PoemDisplayProps) {
   };
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className="w-full">
       <div className="flex items-center gap-3 mb-6">
         <Quote className="w-8 h-8 text-indigo-600" />
         <div>

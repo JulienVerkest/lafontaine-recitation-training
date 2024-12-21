@@ -13,7 +13,7 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   const [isHighlighted, setIsHighlighted] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const VERSES_PER_SECTION = 7;
+  const VERSES_PER_SECTION = 4;
 
   useEffect(() => {
     setRecitation('');
@@ -21,7 +21,6 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
     setCorrectCount(0);
     setCurrentLineIndex(0);
     
-    // Add highlight effect when poem changes
     if (poem) {
       setIsHighlighted(true);
       setTimeout(() => setIsHighlighted(false), 1000);
@@ -32,16 +31,10 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
     const handleSectionChange = (event: Event) => {
       const customEvent = event as CustomEvent;
       setRecitation('');
-      if (customEvent.detail) {
-        const newIndex = customEvent.detail.startIndex;
-        setCurrentLineIndex(newIndex);
-        
-        const newValidatedLines = [...validatedLines];
-        while (newValidatedLines.length < newIndex) {
-          newValidatedLines.push(true);
-        }
-        setValidatedLines(newValidatedLines);
-        setCorrectCount(newValidatedLines.filter(Boolean).length);
+      if (customEvent.detail && customEvent.detail.section !== undefined) {
+        const newSection = customEvent.detail.section;
+        const newStartIndex = newSection * VERSES_PER_SECTION;
+        setCurrentLineIndex(newStartIndex);
       }
     };
 
@@ -49,7 +42,7 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
     return () => {
       window.removeEventListener('sectionChange', handleSectionChange);
     };
-  }, [validatedLines]);
+  }, []);
 
   const handleRecitationChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -96,8 +89,20 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
 
   if (!poem) return null;
 
-  const currentSection = Math.floor(correctCount / VERSES_PER_SECTION);
+  const currentSection = Math.floor(currentLineIndex / VERSES_PER_SECTION);
   const progress = (correctCount / poem.content.length) * 100;
+
+  const getCurrentSectionLines = () => {
+    const start = currentSection * VERSES_PER_SECTION;
+    const end = Math.min(start + VERSES_PER_SECTION, poem.content.length);
+    return Array.from({ length: end - start }, (_, i) => validatedLines[start + i] || false);
+  };
+
+  const getOpacity = (index: number) => {
+    const baseOpacity = 0.3;
+    const opacityStep = (1 - baseOpacity) / (VERSES_PER_SECTION - 1);
+    return baseOpacity + (opacityStep * (VERSES_PER_SECTION - 1 - index));
+  };
 
   return (
     <Card className={`w-full transition-all duration-500 ${
@@ -106,7 +111,7 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
         : 'shadow-md border border-gray-200'
     }`}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-serif text-gray-800">Récitons <em>{poem.title}</em></h2>
+        <h2 className="text-2xl font-serif text-gray-800">Récitation</h2>
         <div className="flex items-center gap-4">
           <div className="h-2 w-32 bg-gray-200 rounded-full overflow-hidden">
             <div 
@@ -120,30 +125,47 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
         </div>
       </div>
 
-      <CustomTextarea
-        ref={textareaRef}
-        value={recitation}
-        onChange={handleRecitationChange}
-        placeholder="Écrivez votre récitation ici..."
-        className="h-48 font-serif text-lg resize-none mb-4"
-        spellCheck={false}
-      />
+      <div className="flex gap-6">
+        <div className="flex-1">
+          <CustomTextarea
+            ref={textareaRef}
+            value={recitation}
+            onChange={handleRecitationChange}
+            placeholder="Écrivez votre récitation ici..."
+            className="h-48 font-serif text-lg resize-none w-full"
+            spellCheck={false}
+          />
+        </div>
 
-      <div className="space-y-2">
-        {validatedLines
-          .slice(currentSection * VERSES_PER_SECTION, (currentSection + 1) * VERSES_PER_SECTION)
-          .map((isCorrect, index) => (
-            <div key={index} className="flex items-center gap-2">
-              {isCorrect ? (
-                <CheckCircle2 className="w-5 h-5 text-green-500" />
-              ) : (
-                <XCircle className="w-5 h-5 text-red-500" />
-              )}
-              <span className={`font-serif ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
-                Vers {currentSection * VERSES_PER_SECTION + index + 1}
-              </span>
-            </div>
-          ))}
+        <div id="progressRecitation" className="w-64 bg-gray-50 rounded-lg p-4">
+          <div className="text-sm font-medium text-gray-600 mb-3 hidden">
+            Progression de la section {currentSection + 1}
+          </div>
+          <div className="space-y-2">
+            {getCurrentSectionLines().map((isCorrect, index) => (
+              <div 
+                key={index} 
+                className={`flex items-center gap-2 p-2 rounded-lg transition-colors ${
+                  isCorrect ? 'bg-green-50' : 'bg-white'
+                }`}
+                style={{ 
+                  opacity: isCorrect ? 1 : getOpacity(index)
+                }}
+              >
+                {isCorrect ? (
+                  <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                ) : (
+                  <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                )}
+                <span className={`font-serif text-sm ${
+                  isCorrect ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  Vers {currentSection * VERSES_PER_SECTION + index + 1}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </Card>
   );

@@ -5,5 +5,82 @@
 @layer base {
   body {
     @apply bg-gray-50;
+    position: relative;
   }
+
+  /* Container pour l'image de fond */
+  .background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -2;
+    background-image: url('/girl-reading.jpg');
+    background-repeat: no-repeat;
+    background-position: bottom right;
+    background-size: contain;
+    background-attachment: fixed;
+  }
+
+  /* Overlay gradient */
+  .background-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background: linear-gradient(to bottom right, 
+      rgba(238, 242, 255, 0.95), /* from-indigo-50 */
+      rgba(250, 245, 255, 0.85)  /* to-purple-50 */
+    );
+  }
+}
+
+.elegant-title {
+  font-family: 'Cormorant Garamond', serif;
+  @apply relative inline-block;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.elegant-title::before {
+  content: '';
+  @apply absolute -bottom-2 left-1/2 w-1/2 h-0.5 bg-indigo-500 transform -translate-x-1/2;
+}
+
+.elegant-title::after {
+  content: '';
+  @apply absolute -bottom-4 left-1/2 w-1/4 h-0.5 bg-purple-500 transform -translate-x-1/2;
+}
+
+.elegant-title span {
+  @apply relative inline-block;
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.elegant-title span:nth-child(2n) {
+  animation-delay: 0.2s;
+}
+
+.elegant-title span:nth-child(3n) {
+  animation-delay: 0.4s;
+}
+
+.elegant-title span:nth-child(4n) {
+  animation-delay: 0.6s;
+}
+
+.elegant-subtitle {
+  font-family: 'Playfair Display', serif;
+  @apply text-gray-600 italic;
 }
