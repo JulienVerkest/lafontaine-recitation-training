@@ -80,7 +80,7 @@ export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch 
                 onChange={handleRecitationChange}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
-                placeholder="Écrivez votre récitation ici..."
+                placeholder={`Veuillez, cher ami, réciter le premier vers de la fable de Jean de la Fontaine : ${poem.title}...`}
                 className="h-48 font-serif text-lg resize-none w-full pr-12"
                 spellCheck={false}
               />
