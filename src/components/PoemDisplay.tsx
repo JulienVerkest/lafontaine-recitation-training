@@ -47,7 +47,7 @@ export function PoemDisplay({
           key={i}
           className={`transition-colors ${
             isCorrect 
-              ? 'text-green-600 font-medium'
+              ? 'text-green-600 font-medium '
               : isPending 
                 ? 'text-gray-400'
                 : 'text-red-600'
