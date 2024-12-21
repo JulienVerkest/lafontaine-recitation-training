@@ -63,7 +63,8 @@ export function useRecitation({ poem, onValidation, onTextChange }: UseRecitatio
         validatedLines: newValidatedLines,
         correctCount: newCorrectCount,
         currentLineIndex: nextLineIndex,
-        currentSection: newSection
+        currentSection: newSection,
+        recitation: '' // Réinitialiser la récitation après validation
       }));
 
       onValidation(newValidatedLines);

@@ -11,9 +11,9 @@ import { DifficultySelector, type Difficulty } from '../../DifficultySelector';
 export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch }: BaseRecitationProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
+  const [textareaContent, setTextareaContent] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Ajouter un événement personnalisé pour communiquer le statut du focus et la difficulté
   useEffect(() => {
     const event = new CustomEvent('recitationFocusChange', {
       detail: { isFocused, difficulty }
@@ -32,18 +32,21 @@ export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch 
 
   const handleRecitationChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
+    setTextareaContent(value);
+    
     const lines = value.split('\n');
     const currentLine = lines[lines.length - 1];
     
-    updateRecitation(value);
+    updateRecitation(currentLine);
     
     if (validateVerse(currentLine) && state.currentLineIndex < poem.content.length) {
-      const cleanedLines = lines.slice(0, -1).concat([currentLine]);
-      const newValue = cleanedLines.join('\n') + '\n';
+      // Ajouter automatiquement un retour à la ligne après la validation
+      const newValue = value + '\n';
+      setTextareaContent(newValue);
       
       requestAnimationFrame(() => {
-        updateRecitation(newValue);
         if (textareaRef.current) {
+          textareaRef.current.value = newValue;
           textareaRef.current.focus();
           textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
           const length = newValue.length;
@@ -53,18 +56,12 @@ export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch 
     }
   };
 
-  const blurAmount = {
-    easy: 'backdrop-blur-[2px]',
-    medium: 'backdrop-blur-[3px]',
-    hard: 'backdrop-blur-[4px]'
-  }[difficulty];
-
   const progress = (state.correctCount / poem.content.length) * 100;
 
   return (
     <>
       {isFocused && (
-        <div className={`fixed inset-0 bg-black/20 ${blurAmount} transition-all duration-300 ease-in-out z-10`} />
+        <div className={`fixed inset-0 bg-black/20 ${blurAmount[difficulty]} transition-all duration-300 ease-in-out z-10`} />
       )}
       <Card className={`w-full transition-all duration-500 relative z-20 shadow-md border border-gray-200 ${
         isFocused ? 'ring-4 ring-indigo-100' : ''
@@ -96,7 +93,7 @@ export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch 
             <div className="relative">
               <CustomTextarea
                 ref={textareaRef}
-                value={state.recitation}
+                value={textareaContent}
                 onChange={handleRecitationChange}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
@@ -118,3 +115,9 @@ export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch 
     </>
   );
 }
+
+const blurAmount = {
+  easy: 'backdrop-blur-[2px]',
+  medium: 'backdrop-blur-[3px]',
+  hard: 'backdrop-blur-[4px]'
+} as const;

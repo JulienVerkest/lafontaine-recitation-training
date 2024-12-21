@@ -30,8 +30,11 @@ export function PoemDisplay({
     return poem.content.slice(start, end);
   };
 
-  const highlightText = (text: string, index: number) => {
-    if (index !== currentLineIndex) return text;
+  const highlightText = (text: string, absoluteIndex: number) => {
+    // Si la ligne est déjà validée ou n'est pas la ligne courante, retourner le texte tel quel
+    if (validatedLines[absoluteIndex] || absoluteIndex !== currentLineIndex) {
+      return text;
+    }
 
     const charResults = compareCharacters(currentTypedText, text);
     
