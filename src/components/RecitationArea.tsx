@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, Mic, MicOff } from 'lucide-react';
 import { RecitationProps } from '../types/poetry';
 import { validateLine } from '../utils/validation';
 import { addRecitedVerse } from '../utils/localStorage';
@@ -12,8 +12,48 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
   const [correctCount, setCorrectCount] = useState(0);
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   const [isHighlighted, setIsHighlighted] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const VERSES_PER_SECTION = 4;
+
+  useEffect(() => {
+    // Initialize speech recognition
+    if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'fr-FR';
+
+      recognitionRef.current.onresult = (event) => {
+        const transcript = Array.from(event.results)
+          .map(result => result[0].transcript)
+          .join('');
+
+        setRecitation(prev => {
+          const lines = prev.split('\n');
+          lines[lines.length - 1] = transcript;
+          return lines.join('\n');
+        });
+      };
+
+      recognitionRef.current.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     setRecitation('');
@@ -43,6 +83,21 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
       window.removeEventListener('sectionChange', handleSectionChange);
     };
   }, []);
+
+  const toggleMicrophone = () => {
+    if (!recognitionRef.current) {
+      alert("La reconnaissance vocale n'est pas supportée par votre navigateur.");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+    } else {
+      setRecitation(prev => prev + '\n');
+      recognitionRef.current.start();
+    }
+    setIsListening(!isListening);
+  };
 
   const handleRecitationChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -127,14 +182,31 @@ export function RecitationArea({ poem, onValidation }: RecitationProps) {
 
       <div className="flex gap-6">
         <div className="flex-1">
-          <CustomTextarea
-            ref={textareaRef}
-            value={recitation}
-            onChange={handleRecitationChange}
-            placeholder="Écrivez votre récitation ici..."
-            className="h-48 font-serif text-lg resize-none w-full"
-            spellCheck={false}
-          />
+          <div className="relative">
+            <CustomTextarea
+              ref={textareaRef}
+              value={recitation}
+              onChange={handleRecitationChange}
+              placeholder="Écrivez votre récitation ici..."
+              className="h-48 font-serif text-lg resize-none w-full pr-12"
+              spellCheck={false}
+            />
+            <button
+              onClick={toggleMicrophone}
+              className={`absolute right-2 bottom-2 p-2 rounded-full transition-colors ${
+                isListening 
+                  ? 'bg-red-100 hover:bg-red-200 text-red-600' 
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+              }`}
+              title={isListening ? "Arrêter la dictée" : "Commencer la dictée"}
+            >
+              {isListening ? (
+                <MicOff className="w-5 h-5" />
+              ) : (
+                <Mic className="w-5 h-5" />
+              )}
+            </button>
+          </div>
         </div>
 
         <div id="progressRecitation" className="w-64 bg-gray-50 rounded-lg p-4">
