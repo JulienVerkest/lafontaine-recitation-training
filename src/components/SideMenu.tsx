@@ -4,6 +4,7 @@ import { getRecitedVerses } from '../utils/localStorage';
 import { Stats } from './Stats';
 import { PoemList } from './PoemList';
 import { Poem } from '../types/poetry';
+import type { Difficulty } from './recitation-area/DifficultySelector';
 
 interface SideMenuProps {
   versesCount: number;
@@ -44,19 +45,39 @@ function CollapsibleSection({ title, children, defaultOpen = false }: Collapsibl
 export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: SideMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [currentDifficulty, setCurrentDifficulty] = useState<Difficulty>('easy');
   const recitedVerses = getRecitedVerses();
 
-  // Gérer le redimensionnement de la fenêtre
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 1024) { // lg breakpoint
-        setIsPinned(false);
-      }
+      const isLargeScreen = window.innerWidth >= 1024;
+      setIsOpen(isLargeScreen);
+      setIsPinned(isLargeScreen);
     };
 
+    handleResize();
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+
+    // Écouter les changements de focus de la récitation
+    const handleFocusChange = (event: CustomEvent) => {
+      setIsFocused(event.detail.isFocused);
+      setCurrentDifficulty(event.detail.difficulty);
+    };
+
+    window.addEventListener('recitationFocusChange', handleFocusChange as EventListener);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('recitationFocusChange', handleFocusChange as EventListener);
+    };
   }, []);
+
+  const blurAmount = {
+    easy: 'backdrop-blur-[2px]',
+    medium: 'backdrop-blur-[3px]',
+    hard: 'backdrop-blur-[4px]'
+  }[currentDifficulty];
 
   return (
     <>
@@ -64,7 +85,9 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
       {!isPinned && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed left-4 top-4 z-40 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-3 hover:bg-gray-50 transition-colors"
+          className={`fixed left-4 top-4 z-40 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-3 hover:bg-gray-50 transition-colors ${
+            isFocused ? 'opacity-50' : ''
+          }`}
           aria-label="Ouvrir le menu"
         >
           <Menu className="w-6 h-6 text-indigo-600" />
@@ -74,7 +97,7 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
       {/* Overlay (visible seulement si le menu est ouvert et non épinglé) */}
       {isOpen && !isPinned && (
         <div
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+          className={`fixed inset-0 bg-black/20 ${isFocused ? blurAmount : ''} z-40`}
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -82,7 +105,7 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
       {/* Side Menu */}
       <div className={`fixed top-0 left-0 h-full w-96 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
         isPinned ? 'translate-x-0' : isOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      } ${isFocused ? 'opacity-50' : ''}`}>
         <div className="h-full flex flex-col">
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center justify-between">

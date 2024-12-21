@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { BaseRecitationProps } from '../../common/types';
 import { useRecitation } from '../../common/useRecitation';
 import Card from '../../../../components/ui/Card';
@@ -6,10 +6,20 @@ import { ProgressBar } from '../../ProgressBar';
 import { VerseProgressList } from '../../VerseProgressList';
 import { Mic } from 'lucide-react';
 import CustomTextarea from '../../../../components/ui/Textarea';
+import { DifficultySelector, type Difficulty } from '../../DifficultySelector';
 
 export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch }: BaseRecitationProps) {
   const [isFocused, setIsFocused] = useState(false);
+  const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Ajouter un événement personnalisé pour communiquer le statut du focus et la difficulté
+  useEffect(() => {
+    const event = new CustomEvent('recitationFocusChange', {
+      detail: { isFocused, difficulty }
+    });
+    window.dispatchEvent(event);
+  }, [isFocused, difficulty]);
 
   const {
     state,
@@ -43,19 +53,25 @@ export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch 
     }
   };
 
+  const blurAmount = {
+    easy: 'backdrop-blur-[2px]',
+    medium: 'backdrop-blur-[3px]',
+    hard: 'backdrop-blur-[4px]'
+  }[difficulty];
+
   const progress = (state.correctCount / poem.content.length) * 100;
 
   return (
     <>
       {isFocused && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-[2px] transition-all duration-300 ease-in-out z-10" />
+        <div className={`fixed inset-0 bg-black/20 ${blurAmount} transition-all duration-300 ease-in-out z-10`} />
       )}
       <Card className={`w-full transition-all duration-500 relative z-20 shadow-md border border-gray-200 ${
         isFocused ? 'ring-4 ring-indigo-100' : ''
       }`}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
-            <h2 className="text-2xl font-serif text-gray-800">Récitation écrite</h2>
+            <h2 className="text-base md:text-2xl font-serif text-gray-800">Récitation écrite</h2>
             <button
               onClick={onModeSwitch}
               className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -63,6 +79,10 @@ export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch 
             >
               <Mic className="w-5 h-5 text-gray-600" />
             </button>
+            <DifficultySelector 
+              difficulty={difficulty}
+              onChange={setDifficulty}
+            />
           </div>
           <ProgressBar 
             progress={progress}

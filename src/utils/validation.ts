@@ -1,12 +1,46 @@
+// Fonction utilitaire pour la gestion des ponctuations avec espace avant
+const PUNCTUATION_WITH_SPACE = [' :', ' ;', ' !', ' ?'];
+const SIMPLE_PUNCTUATION = /[.,«»""''()\-—]/;
+
+function isPunctuationWithSpace(str: string, index: number): boolean {
+  if (index === 0) return false;
+  
+  for (const punct of PUNCTUATION_WITH_SPACE) {
+    if (str.slice(index - 1, index + punct.length - 1) === punct) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isSimplePunctuation(char: string): boolean {
+  return SIMPLE_PUNCTUATION.test(char);
+}
+
 export function normalizeText(text: string): string {
-  return text
+  const normalized = text
     .trim()
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // Remove accents
-    .replace(/[.,!?;:«»""''()\-—]/g, '') // Remove punctuation
+    .replace(/[\u0300-\u036f]/g, ''); // Remove accents
+
+  let result = '';
+  for (let i = 0; i < normalized.length; i++) {
+    // Ignorer les caractères de ponctuation avec espace avant
+    if (isPunctuationWithSpace(normalized, i)) {
+      continue;
+    }
+    // Ignorer la ponctuation simple
+    if (isSimplePunctuation(normalized[i])) {
+      continue;
+    }
+    result += normalized[i];
+  }
+
+  return result
     .replace(/\s+/g, ' ') // Normalize spaces
-    .replace(/œ/g, 'oe'); // Replace œ ligature
+    .replace(/œ/g, 'oe') // Replace œ ligature
+    .trim();
 }
 
 export function validateLine(recited: string, original: string): boolean {
@@ -22,7 +56,6 @@ export function validateRecitation(recited: string[], original: string[]): boole
   });
 }
 
-// Nouvelle fonction pour la comparaison caractère par caractère
 export function compareCharacters(typed: string, original: string): boolean[] {
   const normalizedTyped = typed.toLowerCase();
   const normalizedOriginal = original.toLowerCase();
@@ -33,8 +66,20 @@ export function compareCharacters(typed: string, original: string): boolean[] {
   for (let i = 0; i < normalizedOriginal.length; i++) {
     const originalChar = normalizedOriginal[i];
     
-    // Si c'est un caractère de ponctuation, on le marque comme correct
-    if (/[.,!?;:«»""''()\-—\s]/.test(originalChar)) {
+    // Gestion des ponctuations avec espace avant
+    if (isPunctuationWithSpace(normalizedOriginal, i)) {
+      results.push(true);
+      continue;
+    }
+    
+    // Gestion des ponctuations simples
+    if (isSimplePunctuation(originalChar)) {
+      results.push(true);
+      continue;
+    }
+    
+    // Gestion des espaces
+    if (/\s/.test(originalChar)) {
       results.push(true);
       continue;
     }
@@ -47,7 +92,9 @@ export function compareCharacters(typed: string, original: string): boolean[] {
     
     // On cherche le prochain caractère non-ponctuation dans le texte tapé
     while (typedIndex < normalizedTyped.length && 
-           /[.,!?;:«»""''()\-—\s]/.test(normalizedTyped[typedIndex])) {
+           (isSimplePunctuation(normalizedTyped[typedIndex]) || 
+            /\s/.test(normalizedTyped[typedIndex]) ||
+            isPunctuationWithSpace(normalizedTyped, typedIndex))) {
       typedIndex++;
     }
     

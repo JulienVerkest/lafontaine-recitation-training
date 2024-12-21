@@ -1,10 +1,17 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { PoemDisplay } from './components/PoemDisplay';
 import { RecitationArea } from './components/recitation-area';
 import { SideMenu } from './components/SideMenu';
+import { CountdownTimer } from './components/CountdownTimer';
 import { fables } from './data/fables';
 import { Poem } from './types/poetry';
-import { getVersesCount, incrementVersesCount } from './utils/localStorage';
+import { 
+  getVersesCount, 
+  incrementVersesCount, 
+  saveLastSelectedPoem,
+  getLastSelectedPoem,
+  hasVisitedBefore
+} from './utils/localStorage';
 
 function App() {
   const [selectedPoem, setSelectedPoem] = useState<Poem | null>(null);
@@ -12,9 +19,22 @@ function App() {
   const [totalVersesCount, setTotalVersesCount] = useState(0);
   const [currentTypedText, setCurrentTypedText] = useState('');
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
+  const [showCountdown, setShowCountdown] = useState(false);
 
   useEffect(() => {
     setTotalVersesCount(getVersesCount());
+    
+    // Vérifier s'il y a un poème précédemment sélectionné
+    const lastPoemId = getLastSelectedPoem();
+    if (lastPoemId) {
+      const lastPoem = fables.find(poem => poem.id === lastPoemId);
+      if (lastPoem) {
+        setSelectedPoem(lastPoem);
+      }
+    } else if (!hasVisitedBefore()) {
+      // Démarrer le compte à rebours uniquement lors de la première visite
+      setShowCountdown(true);
+    }
   }, []);
 
   const handlePoemSelect = (poem: Poem) => {
@@ -22,6 +42,14 @@ function App() {
     setValidatedLines([]);
     setCurrentTypedText('');
     setCurrentLineIndex(0);
+    setShowCountdown(false);
+    saveLastSelectedPoem(poem.id);
+  };
+
+  const handleRandomSelection = () => {
+    const randomIndex = Math.floor(Math.random() * fables.length);
+    const randomPoem = fables[randomIndex];
+    handlePoemSelect(randomPoem);
   };
 
   const handleValidation = (newValidatedLines: boolean[]) => {
@@ -54,15 +82,15 @@ function App() {
         versesCount={totalVersesCount}
       />
       <div className="container mx-auto px-4 py-12 lg:pl-[384px] transition-all duration-300">
-        <header className="text-center mb-8">
-          <h1 className="elegant-title text-5xl mb-4 tracking-wide">
+        <header className="text-center mb-6">
+          <h1 className="elegant-title text-2xl md:text-4xl mb-2">
             {"Les Fables de La Fontaine".split('').map((char, i) => (
-              <span key={i} className="inline-block mx-[0.01em]">
-                {char}
+              <span key={i} className="inline-block mx-[0.02em]">
+                {char === ' ' ? '\u00A0' : char}
               </span>
             ))}
           </h1>
-          <p className="elegant-subtitle text-xl">
+          <p className="elegant-subtitle text-lg hidden md:block">
             Récitez les plus belles fables
           </p>
         </header>
@@ -83,6 +111,11 @@ function App() {
                 validatedLines={validatedLines}
                 currentTypedText={currentTypedText}
                 currentLineIndex={currentLineIndex}
+              />
+            ) : showCountdown ? (
+              <CountdownTimer 
+                seconds={7} 
+                onComplete={handleRandomSelection} 
               />
             ) : (
               <div className="bg-white/50 backdrop-blur-sm rounded-lg shadow-lg p-8 text-center">
