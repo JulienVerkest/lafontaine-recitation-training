@@ -64,7 +64,7 @@ export function useRecitation({ poem, onValidation, onTextChange }: UseRecitatio
         correctCount: newCorrectCount,
         currentLineIndex: nextLineIndex,
         currentSection: newSection,
-        recitation: '' // Réinitialiser la récitation après validation
+        recitation: ''
       }));
 
       onValidation(newValidatedLines);
@@ -94,12 +94,24 @@ export function useRecitation({ poem, onValidation, onTextChange }: UseRecitatio
     return baseOpacity + (opacityStep * (VERSES_PER_SECTION - 1 - index));
   };
 
+  const restart = () => {
+    setState({
+      recitation: '',
+      validatedLines: [],
+      correctCount: 0,
+      currentLineIndex: 0,
+      currentSection: 0
+    });
+    onValidation([]);
+  };
+
   return {
     state,
     validateVerse,
     updateRecitation,
     getCurrentSectionLines,
     getOpacity,
-    VERSES_PER_SECTION
+    VERSES_PER_SECTION,
+    restart
   };
 }

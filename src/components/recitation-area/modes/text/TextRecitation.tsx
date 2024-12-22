@@ -4,17 +4,19 @@ import { useRecitation } from '../../common/useRecitation';
 import Card from '../../../../components/ui/Card';
 import { ProgressBar } from '../../ProgressBar';
 import { VerseProgressList } from '../../VerseProgressList';
-import { Mic } from 'lucide-react';
+import { Mic, RotateCcw } from 'lucide-react';
 import CustomTextarea from '../../../../components/ui/Textarea';
 import { DifficultySelector, type Difficulty } from '../../DifficultySelector';
 import { Toolbar } from '../../toolbar/Toolbar';
 import { ToolbarButton } from '../../toolbar/ToolbarButton';
 import { ToolbarSeparator } from '../../toolbar/ToolbarSeparator';
+import { CompletionMessage } from '../../CompletionMessage';
 
 export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch }: BaseRecitationProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [textareaContent, setTextareaContent] = useState('');
+  const [isCompleted, setIsCompleted] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -30,8 +32,19 @@ export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch 
     updateRecitation,
     getCurrentSectionLines,
     getOpacity,
-    VERSES_PER_SECTION
+    VERSES_PER_SECTION,
+    restart
   } = useRecitation({ poem, onValidation, onTextChange });
+
+  useEffect(() => {
+    if (state.correctCount === poem.content.length && state.correctCount > 0) {
+      setIsCompleted(true);
+      if (textareaRef.current) {
+        textareaRef.current.blur();
+      }
+      setIsFocused(false);
+    }
+  }, [state.correctCount, poem.content.length]);
 
   const handleRecitationChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -58,7 +71,25 @@ export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch 
     }
   };
 
+  const handleRestart = () => {
+    restart();
+    setTextareaContent('');
+    setIsCompleted(false);
+    if (textareaRef.current) {
+      textareaRef.current.value = '';
+    }
+  };
+
   const progress = (state.correctCount / poem.content.length) * 100;
+
+  if (isCompleted) {
+    return (
+      <CompletionMessage 
+        poemTitle={poem.title}
+        versesCount={poem.content.length}
+      />
+    );
+  }
 
   return (
     <>
@@ -81,6 +112,12 @@ export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch 
               <DifficultySelector 
                 difficulty={difficulty}
                 onChange={setDifficulty}
+              />
+              <ToolbarSeparator />
+              <ToolbarButton
+                onClick={handleRestart}
+                title="Recommencer"
+                icon={<RotateCcw className="w-4 h-4" />}
               />
             </Toolbar>
           </div>

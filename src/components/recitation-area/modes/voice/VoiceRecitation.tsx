@@ -1,15 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BaseRecitationProps } from '../../common/types';
 import { useRecitation } from '../../common/useRecitation';
 import { useVoiceRecognition } from '../../useVoiceRecognition';
 import Card from '../../../../components/ui/Card';
 import { ProgressBar } from '../../ProgressBar';
 import { VerseProgressList } from '../../VerseProgressList';
-import { Keyboard, Mic, MicOff } from 'lucide-react';
+import { Keyboard, Mic, MicOff, RotateCcw } from 'lucide-react';
 import { DifficultySelector, type Difficulty } from '../../DifficultySelector';
 import { Toolbar } from '../../toolbar/Toolbar';
 import { ToolbarButton } from '../../toolbar/ToolbarButton';
 import { ToolbarSeparator } from '../../toolbar/ToolbarSeparator';
+import { CompletionMessage } from '../../CompletionMessage';
 
 interface VoiceRecognitionButtonProps {
   isListening: boolean;
@@ -39,6 +40,7 @@ function VoiceRecognitionButton({ isListening, onClick }: VoiceRecognitionButton
 export function VoiceRecitation({ poem, onValidation, onTextChange, onModeSwitch }: BaseRecitationProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
+  const [isCompleted, setIsCompleted] = useState(false);
 
   const {
     state,
@@ -46,8 +48,19 @@ export function VoiceRecitation({ poem, onValidation, onTextChange, onModeSwitch
     updateRecitation,
     getCurrentSectionLines,
     getOpacity,
-    VERSES_PER_SECTION
+    VERSES_PER_SECTION,
+    restart
   } = useRecitation({ poem, onValidation, onTextChange });
+
+  useEffect(() => {
+    if (state.correctCount === poem.content.length && state.correctCount > 0) {
+      setIsCompleted(true);
+      setIsFocused(false);
+      if (isListening) {
+        toggleMicrophone();
+      }
+    }
+  }, [state.correctCount, poem.content.length]);
 
   const handleTranscriptUpdate = (transcript: string) => {
     const newText = transcript.trim();
@@ -57,7 +70,24 @@ export function VoiceRecitation({ poem, onValidation, onTextChange, onModeSwitch
 
   const { isListening, toggleMicrophone } = useVoiceRecognition(handleTranscriptUpdate);
 
+  const handleRestart = () => {
+    restart();
+    setIsCompleted(false);
+    if (isListening) {
+      toggleMicrophone();
+    }
+  };
+
   const progress = (state.correctCount / poem.content.length) * 100;
+
+  if (isCompleted) {
+    return (
+      <CompletionMessage 
+        poemTitle={poem.title}
+        versesCount={poem.content.length}
+      />
+    );
+  }
 
   return (
     <>
@@ -80,6 +110,12 @@ export function VoiceRecitation({ poem, onValidation, onTextChange, onModeSwitch
               <DifficultySelector 
                 difficulty={difficulty}
                 onChange={setDifficulty}
+              />
+              <ToolbarSeparator />
+              <ToolbarButton
+                onClick={handleRestart}
+                title="Recommencer"
+                icon={<RotateCcw className="w-4 h-4" />}
               />
             </Toolbar>
           </div>
