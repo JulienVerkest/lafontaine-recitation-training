@@ -24,7 +24,6 @@ function App() {
   useEffect(() => {
     setTotalVersesCount(getVersesCount());
     
-    // Vérifier s'il y a un poème précédemment sélectionné
     const lastPoemId = getLastSelectedPoem();
     if (lastPoemId) {
       const lastPoem = fables.find(poem => poem.id === lastPoemId);
@@ -32,7 +31,6 @@ function App() {
         setSelectedPoem(lastPoem);
       }
     } else if (!hasVisitedBefore()) {
-      // Démarrer le compte à rebours uniquement lors de la première visite
       setShowCountdown(true);
     }
   }, []);
@@ -85,7 +83,11 @@ function App() {
         <header className="text-center mb-6">
           <h1 className="elegant-title text-2xl md:text-4xl mb-2">
             {"Les Fables de La Fontaine".split('').map((char, i) => (
-              <span key={i} className="inline-block mx-[0.02em]">
+              <span 
+                key={i} 
+                className="inline-block mx-[0.02em]"
+                style={{ '--char-index': i } as React.CSSProperties}
+              >
                 {char === ' ' ? '\u00A0' : char}
               </span>
             ))}

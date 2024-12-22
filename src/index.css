@@ -39,8 +39,7 @@
 .elegant-title {
   font-family: 'Cormorant Garamond', serif;
   @apply relative inline-block text-center;
-  color: #2C1810;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  color: #4F46E5;
   position: relative;
   padding: 0.5em 2em;
   letter-spacing: 0.05em;
@@ -48,24 +47,71 @@
 
 .elegant-title::before,
 .elegant-title::after {
-  content: '❦';
+  content: '🦊';
   position: absolute;
-  font-size: 2rem;
-  color: #2C1810;
+  font-size: 1.75rem;
   top: 50%;
   transform: translateY(-50%);
-  opacity: 0.7;
 }
 
 .elegant-title::before {
   left: 0;
+  transform: translateY(-50%) scaleX(-1);
 }
 
 .elegant-title::after {
   right: 0;
 }
 
+.elegant-title span {
+  position: relative;
+  display: inline-block;
+  animation: float 6s ease-in-out infinite;
+  animation-delay: calc(0.1s * var(--char-index));
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
 .elegant-subtitle {
   font-family: 'Playfair Display', serif;
-  @apply text-gray-600 italic;
+  @apply text-indigo-600 italic relative inline-block;
+  padding: 0 2em;
+}
+
+.elegant-subtitle::before,
+.elegant-subtitle::after {
+  content: '~';
+  position: absolute;
+  font-size: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  @apply text-indigo-400;
+}
+
+.elegant-subtitle::before {
+  left: 0.5em;
+}
+
+.elegant-subtitle::after {
+  right: 0.5em;
+}
+
+/* Ajout d'une animation de survol sur le titre */
+.elegant-title:hover span {
+  animation-play-state: paused;
+}
+
+.elegant-title:hover::before {
+  content: '🐺';
+}
+
+.elegant-title:hover::after {
+  content: '🐇';
 }
