@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { PoemDisplay } from './components/PoemDisplay';
 import { RecitationArea } from './components/recitation-area';
-import { SideMenu } from './components/SideMenu';
+import { SideMenu } from './components/side-menu';
 import { CountdownTimer } from './components/CountdownTimer';
 import { fables } from './data/fables';
 import { Poem } from './types/poetry';
