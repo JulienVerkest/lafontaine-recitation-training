@@ -17,10 +17,10 @@ export function VerseProgress({ isCorrect, verseNumber, opacity }: VerseProgress
       {isCorrect ? (
         <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
       ) : (
-        <XCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+        <XCircle className="w-4 h-4 text-gray-300 flex-shrink-0" />
       )}
       <span className={`font-serif text-xs ${
-        isCorrect ? 'text-green-600' : 'text-red-600'
+        isCorrect ? 'text-green-600' : 'text-gray-600'
       }`}>
         Vers {verseNumber}
       </span>

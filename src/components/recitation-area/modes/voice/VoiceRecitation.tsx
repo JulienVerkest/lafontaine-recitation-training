@@ -69,7 +69,7 @@ export function VoiceRecitation({ poem, onValidation, onTextChange, onModeSwitch
       }`}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
-            <h2 className="text-base md:text-2xl font-serif text-gray-800">Récitation Vocale</h2>
+            <h2 className="text-base md:text-2xl font-serif text-gray-800">Récitation vocale</h2>
             <Toolbar>
               <ToolbarButton
                 onClick={onModeSwitch}
