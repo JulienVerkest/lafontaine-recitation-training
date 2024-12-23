@@ -110,7 +110,7 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
             >
               <RecitedVersesList 
                 versesCount={versesCount}
-                recitedVerses={recitedVerses as RecitedVerses}
+                recitedVerses={recitedVerses as unknown as RecitedVerses}
                 isPoemCompleted={(poemId: string) => !!isPoemCompleted(poemId)}
               />
             </CollapsibleSection>
