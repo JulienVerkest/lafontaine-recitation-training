@@ -39,3 +39,8 @@ export interface ValidationResult {
   totalLines: number;
   validatedLines: boolean[];
 }
+
+export interface RecitedVerses {
+  poemeTitle: string;
+  lines: string[];
+}

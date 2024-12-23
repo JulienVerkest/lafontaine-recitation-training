@@ -33,7 +33,7 @@ export function RecitedVersesList({ versesCount, recitedVerses, isPoemCompleted 
                     {isCompleted ? '🎭' : '📝'}
                   </span>
                   <span className={`font-medium flex-grow ${isCompleted ? 'text-green-800' : 'text-gray-800'}`}>
-                    {verses.poemTitle}
+                    {verses.poemTitle as string}
                   </span>
                   <span className="text-xs text-gray-500">
                     {verses.lines.length} vers
@@ -41,7 +41,7 @@ export function RecitedVersesList({ versesCount, recitedVerses, isPoemCompleted 
                   <ChevronDown className="w-4 h-4 text-gray-400 transition-transform group-open:rotate-180" />
                 </summary>
                 <div className="px-4 py-2 space-y-1 border-t border-gray-200">
-                  {verses.lines.map((line, index) => (
+                  {verses.lines.map((line: string, index: number) => (
                     <div 
                       key={index}
                       className="flex items-start gap-2 py-1 text-sm"
