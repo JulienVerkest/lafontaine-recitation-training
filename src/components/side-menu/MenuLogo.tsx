@@ -10,12 +10,12 @@ export function MenuLogo() {
         </div>
       </div>
       <div className="flex flex-col">
-        <h2 className="text-2xl font-serif font-bold bg-gradient-to-r from-indigo-600 to-indigo-800 bg-clip-text text-transparent">
+        {/* <h2 className="text-2xl font-serif font-bold bg-gradient-to-r from-indigo-600 to-indigo-800 bg-clip-text text-transparent">
           Menu
-        </h2>
-        <span className="text-xs text-indigo-500 font-medium tracking-wider">
-          LA FONTAINE
-        </span>
+        </h2> */}
+        {/* <span className="text-xs text-indigo-500 font-medium tracking-wider">
+          
+        </span> */}
       </div>
     </div>
   );

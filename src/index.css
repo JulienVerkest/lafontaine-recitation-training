@@ -8,7 +8,7 @@
     position: relative;
   }
 
-  .background-container {
+  /* .background-container {
     position: fixed;
     top: 0;
     left: 0;
@@ -20,7 +20,7 @@
     background-position: bottom right;
     background-size: contain;
     background-attachment: fixed;
-  }
+  } */
 
   .background-overlay {
     position: fixed;

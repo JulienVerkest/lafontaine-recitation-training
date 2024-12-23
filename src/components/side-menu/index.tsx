@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Menu as MenuIcon } from 'lucide-react';
 import { getRecitedVerses } from '../../utils/localStorage';
 import { PoemList } from '../PoemList';
-import { Poem } from '../../types/poetry';
+import { Poem, RecitedVerses } from '../../types/poetry';
 import type { Difficulty } from '../recitation-area/DifficultySelector';
 import { CollapsibleSection } from './CollapsibleSection';
 import { MenuHeader } from './MenuHeader';
@@ -110,8 +110,8 @@ export function SideMenu({ versesCount, poems, onSelectPoem, selectedPoemId }: S
             >
               <RecitedVersesList 
                 versesCount={versesCount}
-                recitedVerses={recitedVerses}
-                isPoemCompleted={isPoemCompleted}
+                recitedVerses={recitedVerses as RecitedVerses}
+                isPoemCompleted={(poemId: string) => !!isPoemCompleted(poemId)}
               />
             </CollapsibleSection>
           </div>

@@ -92,9 +92,9 @@ function App() {
               </span>
             ))}
           </h1>
-          <p className="elegant-subtitle text-lg hidden md:block">
+          {/* <p className="elegant-subtitle text-lg hidden md:block">
             Récitez les plus belles fables
-          </p>
+          </p> */}
         </header>
 
         <div className="max-w-4xl mx-auto space-y-8">
