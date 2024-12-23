@@ -20,8 +20,8 @@ export function PoemList({ poems, onSelectPoem, selectedPoemId }: PoemListProps)
 
   return (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <div className="relative">
+      <div className="flex gap-2">
+        <div className="relative flex-1">
           <input
             type="text"
             placeholder="Rechercher une fable..."
@@ -32,15 +32,13 @@ export function PoemList({ poems, onSelectPoem, selectedPoemId }: PoemListProps)
           <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
         </div>
         
-        <div className="flex justify-end">
-          <button
-            onClick={() => setSortBy(sortBy === 'title' ? 'length' : 'title')}
-            className="flex items-center gap-2 px-3 py-1 text-sm text-gray-600 hover:text-indigo-600 transition-colors"
-          >
-            <Filter className="w-4 h-4" />
-            Trier par {sortBy === 'title' ? 'longueur' : 'titre'}
-          </button>
-        </div>
+        <button
+          onClick={() => setSortBy(sortBy === 'title' ? 'length' : 'title')}
+          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-indigo-600 transition-colors bg-white rounded-lg border border-gray-200 hover:border-indigo-500"
+        >
+          <Filter className="w-4 h-4" />
+          {sortBy === 'title' ? 'Longueur' : 'Titre'}
+        </button>
       </div>
 
       <div className="space-y-2 max-h-[400px] overflow-y-auto">

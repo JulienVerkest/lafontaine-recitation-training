@@ -80,8 +80,8 @@ function App() {
         versesCount={totalVersesCount}
       />
       <div className="container mx-auto px-4 py-12 lg:pl-[384px] transition-all duration-300">
-        <header className="text-center mb-6">
-          <h1 className="elegant-title text-2xl md:text-4xl mb-2">
+        <header className="text-center mb-2">
+          <h1 className="elegant-title text-xl md:text-4xl ">
             {"Les Fables de La Fontaine".split('').map((char, i) => (
               <span 
                 key={i} 
