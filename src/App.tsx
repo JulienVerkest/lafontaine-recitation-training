@@ -3,6 +3,7 @@ import { PoemDisplay } from './components/PoemDisplay';
 import { RecitationArea } from './components/recitation-area';
 import { SideMenu } from './components/side-menu';
 import { CountdownTimer } from './components/CountdownTimer';
+import { Title } from './components/Title';
 import { fables } from './data/fables';
 import { Poem } from './types/poetry';
 import { 
@@ -80,22 +81,7 @@ function App() {
         versesCount={totalVersesCount}
       />
       <div className="container mx-auto px-4 py-12 lg:pl-[384px] transition-all duration-300">
-        <header className="text-center mb-2">
-          <h1 className="elegant-title text-xl md:text-4xl ">
-            {"Les Fables de La Fontaine".split('').map((char, i) => (
-              <span 
-                key={i} 
-                className="inline-block mx-[0.02em]"
-                style={{ '--char-index': i } as React.CSSProperties}
-              >
-                {char === ' ' ? '\u00A0' : char}
-              </span>
-            ))}
-          </h1>
-          {/* <p className="elegant-subtitle text-lg hidden md:block">
-            Récitez les plus belles fables
-          </p> */}
-        </header>
+        <Title text="Les Fables de La Fontaine" />
 
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="w-full">
