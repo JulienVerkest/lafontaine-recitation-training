@@ -34,6 +34,15 @@ export function TextRecitation({ poem, onValidation, onTextChange, onModeSwitch 
     window.dispatchEvent(event);
   }, [isFocused, difficulty]);
 
+  // Réinitialiser l'état isCompleted quand la prop poem change
+  useEffect(() => {
+    setIsCompleted(false);
+    setTextareaContent('');
+    if (textareaRef.current) {
+      textareaRef.current.value = '';
+    }
+  }, [poem]);
+
   const {
     state,
     validateVerse,

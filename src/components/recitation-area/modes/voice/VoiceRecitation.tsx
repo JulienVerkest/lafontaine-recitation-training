@@ -51,6 +51,12 @@ export function VoiceRecitation({ poem, onValidation, onTextChange, onModeSwitch
     newDifficulty?: Difficulty;
   } | null>(null);
 
+  // Réinitialiser l'état isCompleted quand la prop poem change
+  useEffect(() => {
+    setIsCompleted(false);
+    setTranscriptHistory([]);
+  }, [poem]);
+
   const {
     state,
     validateVerse,
