@@ -989,7 +989,7 @@ export const fables: Poem[] = [
     {
       "id": 297,
       "status": "published",
-      "year": 1668,
+      "year": "1668",
       "author": "Jean de La Fontaine",
       "title": "L'Hirondelle et les petits Oiseaux",
       "livre": 1,
