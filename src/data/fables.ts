@@ -1114,7 +1114,7 @@ export const fables: Poem[] = [
       "title": "Le Dragon à plusieurs têtes et le Dragon à plusieurs queues",
       "livre": 1,
       "sort": 12,
-      "Texte": [
+      "content": [
         "Un Envoyé du Grand Seigneur",
         "Préférait, dit l'Histoire, un jour chez l'Empereur,",
         "Les forces de son Maître à celles de l'Empire.",
@@ -1145,7 +1145,7 @@ export const fables: Poem[] = [
         "De votre Empereur et du nôtre."
       ],
       "Slug": "le-dragon-a-plusieurs-tetes-et-le-dragon-a-plusieurs-queues",
-      "learnt": null,
+      "learnt": true,
       "number": 12,
       "next": 302,
       "prev": 300,
