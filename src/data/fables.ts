@@ -1152,7 +1152,7 @@ export const fables: Poem[] = [
       "cover": "62b55c6a-a38c-46dc-a069-8d618528ecc8"
     },
     {
-      "id": 294,
+      "id": 302,
       "status": "published",
       "title": "Les Voleurs et l'Âne",
       "livre": 1,
@@ -1181,4 +1181,5 @@ export const fables: Poem[] = [
       "next": 303,
       "prev": 301,
       "cover": "799828b0-8507-4761-a718-b000354922d9"
+    }
   ];
