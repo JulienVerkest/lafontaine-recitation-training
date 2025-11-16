@@ -1181,5 +1181,5 @@ export const fables: Poem[] = [
       "next": 303,
       "prev": 301,
       "cover": "799828b0-8507-4761-a718-b000354922d9",
-      "nbvers": 14,
+      "nbvers": 14
   ];
