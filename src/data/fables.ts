@@ -1309,7 +1309,7 @@ export const fables: Poem[] = [
         "Et dont les pieds touchaient à l'Empire des Morts"
       ],
       "Slug": "le-chene-et-le-roseau",
-      "learnt": null,
+      "learnt": true,
       "number": 22,
       "next": 313,
       "prev": 309,
